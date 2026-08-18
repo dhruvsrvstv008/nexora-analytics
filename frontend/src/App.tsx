@@ -3,8 +3,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { lazy, Suspense, type ReactNode } from 'react';
 
-const LoginPage    = lazy(() => import('@/pages/LoginPage'));
-const ExecutivePage = lazy(() => import('@/pages/ExecutivePage'));
+const LoginPage       = lazy(() => import('@/pages/LoginPage'));
+const ExecutivePage   = lazy(() => import('@/pages/ExecutivePage'));
+const SalesPage       = lazy(() => import('@/pages/SalesPage'));
+const WorkforcePage   = lazy(() => import('@/pages/WorkforcePage'));
+const InventoryPage   = lazy(() => import('@/pages/InventoryPage'));
 const PlaceholderPage = lazy(() => import('@/pages/PlaceholderPage'));
 
 const qc = new QueryClient({
@@ -24,11 +27,11 @@ function AppRoutes() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/" element={<PrivateRoute><ExecutivePage /></PrivateRoute>} />
-        <Route path="/sales"     element={<PrivateRoute><PlaceholderPage title="Sales Analytics" /></PrivateRoute>} />
+        <Route path="/sales"     element={<PrivateRoute><SalesPage /></PrivateRoute>} />
         <Route path="/managers"  element={<PrivateRoute><PlaceholderPage title="Manager Performance" /></PrivateRoute>} />
-        <Route path="/workforce" element={<PrivateRoute><PlaceholderPage title="Workforce Analytics" /></PrivateRoute>} />
+        <Route path="/workforce" element={<PrivateRoute><WorkforcePage /></PrivateRoute>} />
         <Route path="/salary"    element={<PrivateRoute><PlaceholderPage title="Salary Analytics" /></PrivateRoute>} />
-        <Route path="/inventory" element={<PrivateRoute><PlaceholderPage title="Inventory Analytics" /></PrivateRoute>} />
+        <Route path="/inventory" element={<PrivateRoute><InventoryPage /></PrivateRoute>} />
         <Route path="/finance"   element={<PrivateRoute><PlaceholderPage title="Finance Analytics" /></PrivateRoute>} />
         <Route path="/hr"        element={<PrivateRoute><PlaceholderPage title="HR Analytics" /></PrivateRoute>} />
         <Route path="/hierarchy" element={<PrivateRoute><PlaceholderPage title="Org Hierarchy" /></PrivateRoute>} />
