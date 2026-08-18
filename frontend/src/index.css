@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #F8FAFC;
+    color: #0F172A;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 99px; }
+}
+
+@layer components {
+  .card {
+    @apply bg-white rounded-card border border-border shadow-card p-5;
+  }
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-control text-sm font-medium
+           text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-150 cursor-pointer;
+  }
+  .nav-item.active {
+    @apply bg-primary text-white shadow-sm;
+  }
+  .status-pill {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+}
+
+/* Recharts tooltip override */
+.recharts-tooltip-wrapper { outline: none !important; }
