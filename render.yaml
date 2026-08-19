@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: nexora-analytics-api
+    runtime: python
+    region: singapore          # change to the region closest to your users
+    plan: free
+
+    # Build: install deps from the backend requirements file
+    buildCommand: pip install -r backend/requirements.txt
+
+    # Start: bind to 0.0.0.0 and the PORT Render injects
+    startCommand: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port $PORT
+      --workers 1
+
+    # Render sets the working directory to the repo root.
+    # We need Python to find the `app` package inside backend/.
+    rootDir: backend
+
+    # Health check — Render hits this to confirm the deploy succeeded.
+    # The endpoint runs SELECT 1 against the DB, so a bad DATABASE_URL
+    # is caught here rather than silently serving 500s.
+    healthCheckPath: /health
+
+    envVars:
+      - key: DATABASE_URL
+        sync: false          # set manually in the Render dashboard
+
+      - key: SECRET_KEY
+        sync: false          # openssl rand -hex 32 → paste in dashboard
+
+      - key: ALGORITHM
+        value: HS256
+
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "7"
+
+      - key: ENVIRONMENT
+        value: production
+
+      - key: CORS_ORIGINS
+        sync: false          # set to your Netlify URL, e.g. https://nexora.netlify.app

@@ -21,21 +21,24 @@ export default function HierarchyPage() {
       </div>
 
       {/* Meta stats */}
-      {!isPending && data && (
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: 'Total Nodes',      value: String(data.length) },
-            { label: 'Hierarchy Depth',  value: `${maxDepth + 1} levels` },
-            { label: 'Departments',      value: String(deptCount) },
-            { label: 'Algorithm',        value: 'Recursive CTE', accent: '#4F46E5' },
-          ].map(k => (
-            <div key={k.label} className="bg-white rounded-card border border-border shadow-card p-5">
-              <p className="text-xs font-medium text-muted uppercase tracking-wide">{k.label}</p>
-              <p className="mt-2 text-xl font-bold" style={{ color: k.accent ?? '#0F172A' }}>{k.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        {isPending
+          ? [...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-card border border-border shadow-card p-5 h-20 animate-pulse bg-slate-50" />
+            ))
+          : [
+              { label: 'Total Nodes',     value: String(data?.length ?? 0) },
+              { label: 'Hierarchy Depth', value: `${maxDepth + 1} levels` },
+              { label: 'Departments',     value: String(deptCount) },
+              { label: 'Algorithm',       value: 'Recursive CTE', accent: '#4F46E5' },
+            ].map(k => (
+              <div key={k.label} className="bg-white rounded-card border border-border shadow-card p-5">
+                <p className="text-xs font-medium text-muted uppercase tracking-wide">{k.label}</p>
+                <p className="mt-2 text-xl font-bold" style={{ color: k.accent ?? '#0F172A' }}>{k.value}</p>
+              </div>
+            ))
+        }
+      </div>
 
       {/* SQL Showcase callout */}
       <div className="mb-6 p-4 rounded-card border border-primary/30 bg-primary/5 flex items-start gap-3">

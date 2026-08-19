@@ -1,0 +1,15 @@
+[build]
+  base    = "frontend"
+  command = "npm ci && npm run build"
+  publish = "dist"
+
+# VITE_API_URL must be set in Netlify → Site configuration → Environment variables.
+# Build-time env vars are embedded in the JS bundle, so they must be present
+# when Netlify runs `npm run build`, not just at runtime.
+
+# SPA catch-all: any path that does not match a static file (e.g. /salary,
+# /workforce/:id on hard refresh) is served index.html so React Router handles it.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

@@ -1,7 +1,13 @@
 import axios from 'axios';
 
+// In production VITE_API_URL = https://your-app.onrender.com
+// Locally it is unset, so the relative path hits the Vite proxy.
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api/v1`
+  : '/api/v1';
+
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -10,6 +16,15 @@ api.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+let _apiReady = false;
+api.interceptors.response.use((res) => {
+  if (!_apiReady) {
+    _apiReady = true;
+    window.dispatchEvent(new Event('nexora:api-ready'));
+  }
+  return res;
+}, (error) => Promise.reject(error));
 
 api.interceptors.response.use(
   (res) => res,

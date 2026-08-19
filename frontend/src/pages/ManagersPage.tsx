@@ -21,21 +21,24 @@ export default function ManagersPage() {
       </div>
 
       {/* KPI summary */}
-      {!isPending && managers && (
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-          {[
-            { label: 'Total Managers',    value: formatNumber(managers.length) },
-            { label: 'Total Team Revenue',value: formatINR(managers.reduce((s, m) => s + Number(m.revenue ?? 0), 0)) },
-            { label: 'Top Revenue',       value: formatINR(managers[0]?.revenue ?? 0) },
-            { label: 'Total Team Members',value: formatNumber(managers.reduce((s, m) => s + Number(m.team_size ?? 0), 0)) },
-          ].map(k => (
-            <div key={k.label} className="bg-white rounded-card border border-border shadow-card p-5">
-              <p className="text-xs font-medium text-muted uppercase tracking-wide">{k.label}</p>
-              <p className="mt-2 text-2xl font-bold text-ink">{k.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+        {isPending
+          ? [...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-card border border-border shadow-card p-5 h-24 animate-pulse bg-slate-50" />
+            ))
+          : [
+              { label: 'Total Managers',    value: formatNumber(managers?.length ?? 0) },
+              { label: 'Total Team Revenue',value: formatINR((managers ?? []).reduce((s, m) => s + Number(m.revenue ?? 0), 0)) },
+              { label: 'Top Revenue',       value: formatINR(managers?.[0]?.revenue ?? 0) },
+              { label: 'Total Team Members',value: formatNumber((managers ?? []).reduce((s, m) => s + Number(m.team_size ?? 0), 0)) },
+            ].map(k => (
+              <div key={k.label} className="bg-white rounded-card border border-border shadow-card p-5">
+                <p className="text-xs font-medium text-muted uppercase tracking-wide">{k.label}</p>
+                <p className="mt-2 text-2xl font-bold text-ink">{k.value}</p>
+              </div>
+            ))
+        }
+      </div>
 
       {/* Leaderboard */}
       <Card noPad>

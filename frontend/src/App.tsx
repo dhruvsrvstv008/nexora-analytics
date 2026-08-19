@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { ColdStartBanner } from '@/components/ui/ColdStartBanner';
 import { lazy, Suspense, type ReactNode } from 'react';
 
 const LoginPage          = lazy(() => import('@/pages/LoginPage'));
@@ -55,6 +56,7 @@ export default function App() {
       <AuthProvider>
         <BrowserRouter>
           <AppRoutes />
+          <ColdStartBanner />
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>

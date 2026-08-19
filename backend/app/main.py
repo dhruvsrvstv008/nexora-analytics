@@ -1,7 +1,10 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.dependencies import get_db
 from app.routes import auth, executive, sales, managers, workforce, salary, inventory, finance, hr, admin
 
 app = FastAPI(
@@ -15,7 +18,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=settings.cors_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,5 +39,18 @@ app.include_router(admin.router,      prefix=f"{V1}/admin",      tags=["admin"])
 
 
 @app.get("/health", tags=["system"])
-def health_check():
-    return {"status": "ok", "service": "nexora-analytics", "environment": settings.ENVIRONMENT}
+def health_check(db: Session = Depends(get_db)):
+    """Liveness + readiness check. Render uses this to detect a failed deploy."""
+    try:
+        db.execute(text("SELECT 1"))
+        db_ok = True
+    except Exception:
+        db_ok = False
+
+    status = "ok" if db_ok else "degraded"
+    return {
+        "status": status,
+        "service": "nexora-analytics",
+        "environment": settings.ENVIRONMENT,
+        "db": "ok" if db_ok else "unreachable",
+    }
