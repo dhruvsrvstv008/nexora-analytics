@@ -15,7 +15,7 @@ WITH RECURSIVE org_tree AS (
         e.manager_id,
         0                                   AS depth,
         ARRAY[e.employee_id]                AS path,
-        e.full_name                         AS reporting_chain
+        e.full_name::TEXT                   AS reporting_chain
     FROM employees e
     JOIN departments d ON d.department_id = e.department_id
     WHERE e.manager_id IS NULL
