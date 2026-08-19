@@ -264,23 +264,44 @@ ORDER BY e.department_id, dept_salary_rank
 **Business question:** How are employees distributed across salary quartiles?
 
 ```sql
+-- NTILE must be materialised in a CTE before it can be used as a PARTITION BY key.
+-- PostgreSQL does not allow window functions inside window definitions.
+WITH bucketed AS (
+    SELECT
+        e.employee_id,
+        e.full_name,
+        d.name                             AS department_name,
+        e.job_title,
+        e.job_level,
+        e.salary,
+        NTILE(4) OVER (ORDER BY e.salary)  AS salary_quartile
+    FROM employees   e
+    JOIN departments d ON d.department_id = e.department_id
+    WHERE e.status = 'active'
+)
 SELECT
-    e.full_name,
-    e.salary,
-    NTILE(4) OVER (ORDER BY e.salary) AS salary_quartile,
-    CASE NTILE(4) OVER (ORDER BY e.salary)
+    employee_id,
+    full_name,
+    department_name,
+    job_title,
+    job_level,
+    salary,
+    salary_quartile,
+    CASE salary_quartile
         WHEN 1 THEN 'Q1 — Bottom 25%'
         WHEN 2 THEN 'Q2 — Lower Mid'
         WHEN 3 THEN 'Q3 — Upper Mid'
         WHEN 4 THEN 'Q4 — Top 25%'
-    END                                AS quartile_label
-FROM employees e
-JOIN departments d ON d.department_id = e.department_id
-WHERE e.status = 'active'
-ORDER BY e.salary DESC
+    END                                    AS quartile_label,
+    RANK() OVER (
+        PARTITION BY salary_quartile
+        ORDER BY salary DESC
+    )                                      AS rank_in_quartile
+FROM bucketed
+ORDER BY salary DESC
 ```
 
-**Why it's written this way:** `NTILE(4)` divides the ordered result into 4 equal-size buckets — bucket 1 is the bottom 25%, bucket 4 the top 25%. The `CASE` converts the integer to a human-readable label. This is used directly by the salary bands chart in the frontend.
+**Why it's written this way:** `NTILE(4)` divides the ordered result into 4 equal-size buckets — bucket 1 is the bottom 25%, bucket 4 the top 25%. The CTE is required because PostgreSQL forbids window functions inside another window's `PARTITION BY` definition: you cannot write `RANK() OVER (PARTITION BY NTILE(4) OVER (...))` directly. Materialising `NTILE` in `bucketed` first lets the outer `RANK() OVER (PARTITION BY salary_quartile)` reference it as a plain column.
 
 ---
 
@@ -315,12 +336,15 @@ ORDER BY monthly_payroll DESC
 
 ```sql
 WITH RECURSIVE org_tree AS (
-    -- Base case: executives with no manager
+    -- Base case: executives with no manager.
+    -- reporting_chain is cast to TEXT so the type matches the recursive term,
+    -- where string concatenation always produces TEXT regardless of input width.
+    -- Omitting the cast causes a DatatypeMismatch error across the UNION ALL.
     SELECT
         e.employee_id, e.full_name, e.manager_id,
         0                      AS depth,
         ARRAY[e.employee_id]   AS path,
-        e.full_name            AS reporting_chain
+        e.full_name::TEXT      AS reporting_chain
     FROM employees e
     WHERE e.manager_id IS NULL AND e.status = 'active'
 
@@ -345,7 +369,9 @@ FROM org_tree ot
 ORDER BY ot.path
 ```
 
-**Why it's written this way:** The recursive CTE has two parts separated by `UNION ALL`. The base case seeds the tree with root employees; the recursive case joins each employee to their manager's row. The `path` array accumulates visited employee IDs — the `NOT (... = ANY(path))` guard prevents infinite loops if there is a data cycle. The `reporting_chain` string builds a readable ancestry path in one pass. The direct-report count is a correlated subquery; acceptable here because it runs once per row on an indexed column.
+**Why it's written this way:** The recursive CTE has two parts separated by `UNION ALL`. The base case seeds the tree with root employees; the recursive case joins each employee to their manager's row. The `path` array accumulates visited employee IDs — the `NOT (... = ANY(path))` guard prevents infinite loops if there is a data cycle. The `reporting_chain` string builds a readable ancestry path in one pass.
+
+The `::TEXT` cast on `e.full_name` in the base case is load-bearing: PostgreSQL infers the output column type from the non-recursive term. `full_name` is `VARCHAR(150)`, but concatenation in the recursive term (`ot.reporting_chain || ' → ' || e.full_name`) always produces `TEXT`. Without the cast the engine raises `DatatypeMismatch: recursive query column has type character varying(150) in non-recursive term but type character varying overall`. The direct-report count is a correlated subquery; acceptable here because it runs once per row on an indexed column.
 
 ---
 
