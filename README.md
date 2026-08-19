@@ -111,7 +111,7 @@ cd backend
 python -m pytest tests/ -v
 ```
 
-53 tests across 4 files: auth flow, RBAC (403 cases), analytics assertions against known seed numbers, and insights engine shape + data validation.
+57 tests across 4 files: auth flow, RBAC (403 cases + manager team-scoping), analytics assertions against known seed numbers, and insights engine shape + data validation.
 
 ---
 
@@ -134,7 +134,8 @@ python -m pytest tests/ -v
 | Materialized view + refresh endpoint | `mvw_daily_sales_summary` + `/admin` |
 
 Full explanations with business context for the 15 most illustrative queries: **[docs/SQL_SHOWCASE.md](docs/SQL_SHOWCASE.md)**  
-Entity-relationship diagram: **[docs/ERD.md](docs/ERD.md)**
+Entity-relationship diagram: **[docs/ERD.md](docs/ERD.md)**  
+API reference (all 40 endpoints, query params, RBAC): **[docs/API.md](docs/API.md)**
 
 ---
 
@@ -153,7 +154,7 @@ nexora-analytics/
 │   │   └── utils/           # JWT, security helpers
 │   ├── alembic/             # migrations
 │   ├── seed/                # deterministic data generator (random.seed(42))
-│   └── tests/               # 53 pytest tests
+│   └── tests/               # 57 pytest tests
 ├── frontend/
 │   └── src/
 │       ├── api/             # typed Axios wrappers per domain
@@ -163,6 +164,7 @@ nexora-analytics/
 │       ├── lib/             # formatINR, formatPct, cn utilities
 │       └── pages/           # 10 page components
 └── docs/
+    ├── API.md               # All 40 endpoints with params and RBAC
     ├── ERD.md               # Mermaid entity-relationship diagram
     └── SQL_SHOWCASE.md      # 15 queries with business context
 ```

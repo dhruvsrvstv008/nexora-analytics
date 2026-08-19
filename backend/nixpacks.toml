@@ -1,0 +1,7 @@
+# Belt-and-suspenders Python version pin.
+# .python-version = 3.11.9 is also present and read by Nixpacks, but this
+# explicit provider declaration takes precedence over auto-detection.
+# Prevents Nixpacks from defaulting to a newer Python where pydantic-core
+# has no pre-built wheel (the exact failure mode seen on Render with 3.14).
+[phases.setup]
+nixPkgs = ["python311"]
