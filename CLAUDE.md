@@ -27,7 +27,7 @@ Portfolio-grade Business Intelligence platform: FastAPI + PostgreSQL backend, Re
 | 6 | Sales, Workforce, Inventory pages with URL-synced filter bars | ✅ Complete (committed) |
 | 7 | Managers, Salary, Finance, HR, Hierarchy pages + recursive-CTE org tree | ✅ Complete (committed) |
 | 8 | Insights engine — rules wired to per-module endpoints + insight panels on all pages | ✅ Complete (committed) |
-| 9 | Tests, docs (SQL_SHOWCASE.md, ERD.md, README), polish pass | ⏳ Pending |
+| 9 | Tests, docs (SQL_SHOWCASE.md, ERD.md, README), polish pass | ✅ Complete (committed) |
 
 ## Phase 8 — Insights Engine Wiring Tasks
 
