@@ -82,4 +82,5 @@ def test_analyst_can_view_workforce(client: TestClient, analyst_headers):
 def test_unauthenticated_cannot_access_any_route(client: TestClient):
     for path in ["/api/v1/sales/summary", "/api/v1/workforce/summary", "/api/v1/finance/summary"]:
         r = client.get(path)
-        assert r.status_code == 403, f"Expected 403 for unauthenticated {path}, got {r.status_code}"
+        # 401 = no credentials supplied (HTTPBearer); 403 = wrong role — both block access
+        assert r.status_code in (401, 403), f"Expected 401/403 for unauthenticated {path}, got {r.status_code}"

@@ -34,9 +34,9 @@ def test_me_analyst_role(client: TestClient, analyst_headers):
     assert r.json()["role"] == "analyst"
 
 
-def test_me_without_token_is_403(client: TestClient):
+def test_me_without_token_is_401(client: TestClient):
     r = client.get("/api/v1/auth/me")
-    assert r.status_code == 403
+    assert r.status_code == 401
 
 
 def test_refresh_produces_new_access_token(client: TestClient):
