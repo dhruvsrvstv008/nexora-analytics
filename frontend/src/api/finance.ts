@@ -7,4 +7,5 @@ export const financeApi = {
   monthlyTrend:  (params?: object) => api.get<any[]>('/finance/revenue-vs-expenses', p(params ?? {})).then(r => r.data),
   deptCosts:     (params?: object) => api.get<any[]>('/finance/department-costs',    p(params ?? {})).then(r => r.data),
   deptPnl:       (params?: object) => api.get<any[]>('/finance/dept-pnl',            p(params ?? {})).then(r => r.data),
+  insights:      (params?: object) => api.get<import('@/types').Insight[]>('/finance/insights', p(params ?? {})).then(r => r.data),
 };

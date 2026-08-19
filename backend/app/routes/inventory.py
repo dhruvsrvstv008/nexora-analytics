@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, require_role
 from app.services import inventory_service
+from app.insights.rules import generate_inventory_insights
 
 router = APIRouter()
 _ROLES = ("admin", "manager", "analyst")
@@ -42,3 +43,14 @@ def movement_analysis(
     current_user=Depends(require_role(*_ROLES)),
 ):
     return inventory_service.get_velocity(db, category_id=category_id)
+
+
+@router.get("/insights", summary="Rule-based inventory insights")
+def insights(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role(*_ROLES)),
+):
+    """Deterministic rule-based insights for the inventory domain — no AI/LLM."""
+    inv_sum  = inventory_service.get_summary(db)
+    velocity = inventory_service.get_velocity(db)
+    return generate_inventory_insights(inv_summary=inv_sum, velocity_data=velocity)

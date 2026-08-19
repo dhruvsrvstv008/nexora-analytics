@@ -8,7 +8,8 @@ import { ChartSkeleton } from '@/components/ui/Skeleton';
 import { RevenueChart } from '@/components/charts/RevenueChart';
 import { TargetChart } from '@/components/charts/TargetChart';
 import { useFilters } from '@/hooks/useFilters';
-import { useSalesSummary, useSalesTrend, useSalesByDim, useSalesTargets, useSalesOrders } from '@/hooks/useSales';
+import { useSalesSummary, useSalesTrend, useSalesByDim, useSalesTargets, useSalesOrders, useSalesInsights } from '@/hooks/useSales';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { formatINR, formatNumber, formatDate, formatPct } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
@@ -76,6 +77,7 @@ export default function SalesPage() {
   const { data: dimData, isPending: dimPending }   = useSalesByDim(filters);
   const { data: targets, isPending: tgtPending }   = useSalesTargets(filters);
   const { data: orders,  isPending: ordPending }   = useSalesOrders(filters);
+  const { data: insights, isPending: insightsPending } = useSalesInsights(filters);
 
   const trendData = (trend ?? []) as any[];
 
@@ -116,6 +118,11 @@ export default function SalesPage() {
             </Card>
           )}
         </div>
+      </div>
+
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="Sales Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
       </div>
 
       {/* By-dimension breakdown */}

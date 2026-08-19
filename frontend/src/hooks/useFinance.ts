@@ -8,3 +8,4 @@ export const useFinanceSummary  = (f: Partial<Filters>) => useQuery({ queryKey: 
 export const useFinanceTrend    = (f: Partial<Filters>) => useQuery({ queryKey: ['fin','trend', f],     queryFn: () => financeApi.monthlyTrend(Q(f)), staleTime: 60_000 });
 export const useFinanceDeptCosts= (f: Partial<Filters>) => useQuery({ queryKey: ['fin','costs', f],     queryFn: () => financeApi.deptCosts(Q(f)),    staleTime: 60_000 });
 export const useFinanceDeptPnl  = (f: Partial<Filters>) => useQuery({ queryKey: ['fin','pnl', f],       queryFn: () => financeApi.deptPnl(Q(f)),      staleTime: 60_000 });
+export const useFinanceInsights = (f: Partial<Filters>) => useQuery({ queryKey: ['fin','insights', f],   queryFn: () => financeApi.insights(Q(f)),     staleTime: 60_000 });

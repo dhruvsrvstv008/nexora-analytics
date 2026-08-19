@@ -40,11 +40,14 @@ def rule_revenue_change(trend: list[dict]) -> dict | None:
 
 
 def rule_top_department(dept_data: list[dict]) -> dict | None:
-    """Identify the highest-contributing department this period."""
+    """Identify the highest-contributing department — only when concentration is notable (>35%)."""
     if not dept_data:
         return None
     top = dept_data[0]
-    share = top.get("revenue_share_pct", 0)
+    share = float(top.get("revenue_share_pct") or 0)
+    # ≥95 means structural monopoly (one dept owns all sales) — not an actionable insight
+    if share >= 95 or share < 35:
+        return None
     return _insight("neutral", "sales", f"{top.get('department_name')} leads with {share:.1f}% of revenue.", share)
 
 
@@ -198,6 +201,22 @@ def rule_high_salary_dept(salary_data: list[dict]) -> dict | None:
 # FINANCE RULES
 # ══════════════════════════════════════════════════════════════════════════════
 
+def rule_salary_spread(salary_data: list[dict]) -> dict | None:
+    """Flag when the top-paid department earns more than 2× the lowest — pay equity signal."""
+    if len(salary_data) < 2:
+        return None
+    top_avg = float(salary_data[0].get("avg_salary") or 0)
+    bot_avg = float(salary_data[-1].get("avg_salary") or 0)
+    if bot_avg <= 0:
+        return None
+    ratio = top_avg / bot_avg
+    top_name = salary_data[0].get("department_name")
+    bot_name = salary_data[-1].get("department_name")
+    if ratio >= 2.0:
+        return _insight("warning", "hr", f"{top_name} earns {ratio:.1f}× more on average than {bot_name} — review pay equity.", round(ratio, 1))
+    return None
+
+
 def rule_payroll_vs_revenue(payroll: float, revenue: float) -> dict | None:
     """Warn if total expenses exceed 30% of revenue."""
     if revenue <= 0:
@@ -328,6 +347,19 @@ def generate_hr_insights(hr_summary, attrition_data, cap=5):
     for fn, args in [
         (rule_hires_vs_exits, (hr_summary,)),
         (rule_attrition,      (attrition_data, 15.0)),
+    ]:
+        r = fn(*args)
+        if r:
+            out.append(r)
+    return _sort_cap(out, cap)
+
+
+def generate_salary_insights(salary_data: list[dict], payroll: float, revenue: float, cap: int = 5) -> list[dict]:
+    out = []
+    for fn, args in [
+        (rule_salary_spread,      (salary_data,)),
+        (rule_high_salary_dept,   (salary_data,)),
+        (rule_payroll_vs_revenue, (payroll, revenue)),
     ]:
         r = fn(*args)
         if r:

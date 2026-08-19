@@ -7,3 +7,4 @@ export const useAboveDeptAvg     = () => useQuery({ queryKey: ['sal','above-avg'
 export const useTopEarners       = () => useQuery({ queryKey: ['sal','top-earners'],   queryFn: salaryApi.topEarners,     staleTime: 60_000, retry: false });
 export const useSalaryBands      = () => useQuery({ queryKey: ['sal','bands'],         queryFn: salaryApi.bands,          staleTime: 60_000 });
 export const usePayrollShare     = () => useQuery({ queryKey: ['sal','payroll-share'], queryFn: salaryApi.payrollShare,   staleTime: 60_000 });
+export const useSalaryInsights   = () => useQuery({ queryKey: ['sal','insights'],      queryFn: salaryApi.insights,       staleTime: 60_000 });

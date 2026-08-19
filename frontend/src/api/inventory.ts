@@ -31,4 +31,5 @@ export const inventoryApi = {
   byCategory: ()                => api.get<CategoryInventory[]>('/inventory/by-category').then(r => r.data),
   alerts:     (params?: object) => api.get<AlertRow[]>('/inventory/alerts',                 p(params ?? {})).then(r => r.data),
   velocity:   (params?: object) => api.get<VelocityRow[]>('/inventory/movement-analysis',   p(params ?? {})).then(r => r.data),
+  insights:   ()                => api.get<import('@/types').Insight[]>('/inventory/insights').then(r => r.data),
 };

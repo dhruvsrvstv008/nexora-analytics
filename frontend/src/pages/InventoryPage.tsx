@@ -8,7 +8,8 @@ import { KpiSkeleton, ChartSkeleton } from '@/components/ui/Skeleton';
 import { SimpleBarChart } from '@/components/charts/SimpleBarChart';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { useFilters } from '@/hooks/useFilters';
-import { useInventorySummary, useInventoryByCategory, useInventoryAlerts, useInventoryVelocity } from '@/hooks/useInventory';
+import { useInventorySummary, useInventoryByCategory, useInventoryAlerts, useInventoryVelocity, useInventoryInsights } from '@/hooks/useInventory';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { formatINR, formatNumber, formatPct } from '@/lib/format';
 import { DEPT_COLORS, cn } from '@/lib/utils';
 import type { AlertRow, VelocityRow, CategoryInventory } from '@/api/inventory';
@@ -46,6 +47,7 @@ export default function InventoryPage() {
   const { data: byCategory,isPending: catPending }  = useInventoryByCategory();
   const { data: allAlerts, isPending: altPending }  = useInventoryAlerts(filters);
   const { data: velocity,  isPending: velPending }  = useInventoryVelocity(filters);
+  const { data: insights,  isPending: insightsPending } = useInventoryInsights();
 
   const filteredAlerts = (allAlerts ?? []).filter((a: AlertRow) =>
     alertTab === 'all' ? true : a.alert_type === alertTab
@@ -92,6 +94,11 @@ export default function InventoryPage() {
           <StatCard label="Low Stock"       value={String(summary?.low_stock_count ?? 0)} sub="Below reorder level" accent="#F59E0B" />
           <StatCard label="Out of Stock"    value={String(summary?.out_of_stock_count ?? 0)} sub="Zero units" accent="#E11D48" />
         </>)}
+      </div>
+
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="Inventory Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
       </div>
 
       {/* Category charts */}

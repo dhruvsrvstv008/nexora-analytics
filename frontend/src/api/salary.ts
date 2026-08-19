@@ -10,4 +10,5 @@ export const salaryApi = {
   bands:           (params?: object) => api.get<any[]>('/salary/bands',                    p(params ?? {})).then(r => r.data),
   payrollShare:    ()                => api.get<any[]>('/salary/payroll-share').then(r => r.data),
   departmentRank:  (params?: object) => api.get<any[]>('/salary/department-rank',          p(params ?? {})).then(r => r.data),
+  insights:        ()                => api.get<import('@/types').Insight[]>('/salary/insights').then(r => r.data),
 };

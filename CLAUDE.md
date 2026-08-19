@@ -26,7 +26,7 @@ Portfolio-grade Business Intelligence platform: FastAPI + PostgreSQL backend, Re
 | 5 | Vite+Tailwind shell, Executive dashboard, login, KPI cards, Recharts | ✅ Complete (committed) |
 | 6 | Sales, Workforce, Inventory pages with URL-synced filter bars | ✅ Complete (committed) |
 | 7 | Managers, Salary, Finance, HR, Hierarchy pages + recursive-CTE org tree | ✅ Complete (committed) |
-| 8 | Insights engine — rules wired to per-module endpoints + insight panels on all pages | 🔄 In progress |
+| 8 | Insights engine — rules wired to per-module endpoints + insight panels on all pages | ✅ Complete (committed) |
 | 9 | Tests, docs (SQL_SHOWCASE.md, ERD.md, README), polish pass | ⏳ Pending |
 
 ## Phase 8 — Insights Engine Wiring Tasks
@@ -84,4 +84,4 @@ missing. Confirmed present:
 - `docs/` directory exists but is **empty** (Phase 9 — ERD.md, SQL_SHOWCASE.md)
 - `docker-compose.yml` only runs postgres + pgadmin — backend and frontend are **not containerised**
 - No `README.md` exists at repo root (Phase 9)
-- No per-module insights endpoints exist yet (Phase 8 — see wiring table above)
+- bcrypt must stay at 4.0.1 — bcrypt 5.x breaks passlib's `__about__` introspection; pin in requirements.txt

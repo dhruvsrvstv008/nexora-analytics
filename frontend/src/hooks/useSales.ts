@@ -13,3 +13,4 @@ export const useSalesByDim      = (f: Partial<Filters>) => useQuery({ queryKey: 
 export const useSalesTargets    = (f: Partial<Filters>) => useQuery({ queryKey: ['sales','targets', f],    queryFn: () => salesApi.targets(Q(f)),    staleTime: 60_000 });
 export const useSalesOrders     = (f: Partial<Filters>) => useQuery({ queryKey: ['sales','orders', f],     queryFn: () => salesApi.orders({ ...Q(f), status: f.status, limit: f.limit, offset: f.offset }), staleTime: 60_000 });
 export const useTopProducts     = (f: Partial<Filters>) => useQuery({ queryKey: ['sales','top-products',f],queryFn: () => salesApi.topProducts({ year: f.year }),    staleTime: 60_000 });
+export const useSalesInsights   = (f: Partial<Filters>) => useQuery({ queryKey: ['sales','insights', f],   queryFn: () => salesApi.insights({ year: f.year }),       staleTime: 60_000 });

@@ -4,7 +4,8 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ChartSkeleton } from '@/components/ui/Skeleton';
 import { SimpleBarChart } from '@/components/charts/SimpleBarChart';
 import { DonutChart } from '@/components/charts/DonutChart';
-import { useSalarySummary, useSalaryByDept, useAboveDeptAvg, useTopEarners, useSalaryBands, usePayrollShare } from '@/hooks/useSalary';
+import { useSalarySummary, useSalaryByDept, useAboveDeptAvg, useTopEarners, useSalaryBands, usePayrollShare, useSalaryInsights } from '@/hooks/useSalary';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatINR, formatNumber, formatPct } from '@/lib/format';
 import { DEPT_COLORS, cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ export default function SalaryPage() {
   const { data: earners, isPending: earnPending,  error: earnErr  } = useTopEarners();
   const { data: bands,   isPending: bandPending  } = useSalaryBands();
   const { data: payroll, isPending: payPending   } = usePayrollShare();
+  const { data: insights,isPending: insightsPending } = useSalaryInsights();
 
   // Bar chart: avg salary by dept
   const salaryBars = (byDept ?? []).map((d: any, i: number) => ({
@@ -57,6 +59,11 @@ export default function SalaryPage() {
 
   return (
     <AppShell title="Salary Analytics">
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="Salary Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
+      </div>
+
       {/* KPI row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         {sumPending

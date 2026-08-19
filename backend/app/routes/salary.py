@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, require_role
-from app.services import workforce_service
+from app.services import workforce_service, finance_service
+from app.insights.rules import generate_salary_insights
 
 router = APIRouter()
 
@@ -78,3 +79,17 @@ def department_rank(
     current_user=Depends(require_role("admin")),
 ):
     return workforce_service.get_salary_department_rank(db, department_id=department_id)
+
+
+@router.get("/insights", summary="Rule-based salary insights")
+def insights(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role("admin", "analyst")),
+):
+    """Deterministic rule-based insights for the salary domain — no AI/LLM."""
+    salary_data = workforce_service.get_salary_by_department(db)
+    fin_sum     = finance_service.get_summary(db)
+    # Use actual payroll (sum of department payrolls) vs gross revenue for the ratio
+    payroll = sum(float(r.get("monthly_payroll") or 0) for r in salary_data)
+    revenue = float(fin_sum.get("revenue") or 0)
+    return generate_salary_insights(salary_data=salary_data, payroll=payroll, revenue=revenue)

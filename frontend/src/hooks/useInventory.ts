@@ -6,3 +6,4 @@ export const useInventorySummary  = (f: Partial<Filters>) => useQuery({ queryKey
 export const useInventoryByCategory=()                    => useQuery({ queryKey: ['inv','by-cat'],        queryFn: () => inventoryApi.byCategory(),                              staleTime: 60_000 });
 export const useInventoryAlerts   = (f: Partial<Filters>) => useQuery({ queryKey: ['inv','alerts', f],    queryFn: () => inventoryApi.alerts({ category_id: f.category_id }),   staleTime: 60_000 });
 export const useInventoryVelocity = (f: Partial<Filters>) => useQuery({ queryKey: ['inv','velocity', f],  queryFn: () => inventoryApi.velocity({ category_id: f.category_id }), staleTime: 60_000 });
+export const useInventoryInsights = ()                    => useQuery({ queryKey: ['inv','insights'],       queryFn: () => inventoryApi.insights(),                                staleTime: 60_000 });

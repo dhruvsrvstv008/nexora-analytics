@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, require_role
 from app.services import hr_service
+from app.insights.rules import generate_hr_insights
 
 router = APIRouter()
 _ROLES = ("admin", "manager", "analyst")
@@ -47,3 +48,14 @@ def tenure(
                  "status": r["status"]}
                 for r in rows]
     return rows
+
+
+@router.get("/insights", summary="Rule-based HR insights")
+def insights(
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role(*_ROLES)),
+):
+    """Deterministic rule-based insights for the HR domain — no AI/LLM."""
+    hr_sum    = hr_service.get_summary(db)
+    attrition = hr_service.get_attrition(db)
+    return generate_hr_insights(hr_summary=hr_sum, attrition_data=attrition)
