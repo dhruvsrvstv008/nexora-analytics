@@ -82,5 +82,37 @@ def test_analyst_can_view_workforce(client: TestClient, analyst_headers):
 def test_unauthenticated_cannot_access_any_route(client: TestClient):
     for path in ["/api/v1/sales/summary", "/api/v1/workforce/summary", "/api/v1/finance/summary"]:
         r = client.get(path)
-        # 401 = no credentials supplied (HTTPBearer); 403 = wrong role — both block access
-        assert r.status_code in (401, 403), f"Expected 401/403 for unauthenticated {path}, got {r.status_code}"
+        assert r.status_code == 401, f"Expected 401 for unauthenticated {path}, got {r.status_code}"
+
+
+# ── Manager team scoping (sales by-dimension) ─────────────────────────────────
+# Manager user = user_id 3, employee_id 5 ("Ayushman Chander").
+# _mgr_scope forces manager_id = employee_id so they only see their own team.
+
+def test_manager_sees_only_own_team_employees(client: TestClient, manager_headers, admin_headers):
+    mgr = client.get("/api/v1/sales/by-dimension?dim=employee", headers=manager_headers)
+    admin = client.get("/api/v1/sales/by-dimension?dim=employee", headers=admin_headers)
+    assert mgr.status_code == 200
+    # Manager sees a strict subset of what admin sees
+    assert len(mgr.json()) < len(admin.json())
+
+
+def test_manager_team_row_count_is_exact(client: TestClient, manager_headers):
+    r = client.get("/api/v1/sales/by-dimension?dim=employee", headers=manager_headers)
+    assert len(r.json()) == 12
+
+
+def test_manager_team_all_rows_belong_to_their_manager(client: TestClient, manager_headers):
+    rows = client.get("/api/v1/sales/by-dimension?dim=employee", headers=manager_headers).json()
+    manager_names = {row["manager_name"] for row in rows}
+    assert manager_names == {"Ayushman Chander"}
+
+
+def test_manager_cannot_override_own_scope_with_query_param(client: TestClient, manager_headers, admin_headers):
+    # Manager passes manager_id=1 (a different manager); scoping must ignore it
+    # and still return only their own team (12 rows), not the other manager's team.
+    admin_all = client.get("/api/v1/sales/by-dimension?dim=employee", headers=admin_headers)
+    mgr_spoofed = client.get("/api/v1/sales/by-dimension?dim=employee&manager_id=1", headers=manager_headers)
+    assert mgr_spoofed.status_code == 200
+    # Must still be scoped to their team, not the full dataset or manager 1's team
+    assert len(mgr_spoofed.json()) == 12
