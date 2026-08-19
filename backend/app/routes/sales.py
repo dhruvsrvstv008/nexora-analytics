@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, require_role
 from app.services import sales_service
+from app.insights.rules import generate_sales_insights
 
 router = APIRouter()
 _ROLES = ("admin", "manager", "analyst")
@@ -115,3 +116,16 @@ def top_per_category(
     current_user=Depends(require_role(*_ROLES)),
 ):
     return sales_service.get_top_per_category(db, year=year)
+
+
+@router.get("/insights", summary="Rule-based sales insights")
+def insights(
+    year: int | None = Query(None),
+    db: Session = Depends(get_db),
+    current_user=Depends(require_role(*_ROLES)),
+):
+    """Deterministic rule-based insights for the sales domain — no AI/LLM."""
+    trend     = sales_service.get_monthly_trend(db, year=year)
+    dept_data = sales_service.get_by_department(db, year=year)
+    targets   = sales_service.get_targets(db, year=year)
+    return generate_sales_insights(trend=trend, dept_data=dept_data, targets=targets)

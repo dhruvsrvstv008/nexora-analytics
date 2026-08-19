@@ -6,7 +6,8 @@ import { SimpleBarChart } from '@/components/charts/SimpleBarChart';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { HeadcountChart } from '@/components/charts/HeadcountChart';
 import { useFilters } from '@/hooks/useFilters';
-import { useWfSummary, useWfDistribution, useHeadcountTrend, useSalaryByDept, useTenure } from '@/hooks/useWorkforce';
+import { useWfSummary, useWfDistribution, useHeadcountTrend, useSalaryByDept, useTenure, useWorkforceInsights } from '@/hooks/useWorkforce';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { formatINR, formatNumber, formatPct } from '@/lib/format';
 import { DEPT_COLORS } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ export default function WorkforcePage() {
   const { data: hcTrend,   isPending: hcPending }    = useHeadcountTrend(filters);
   const { data: salaryDept,isPending: salPending }   = useSalaryByDept();
   const { data: tenure,    isPending: tenPending }   = useTenure(filters);
+  const { data: insights,  isPending: insightsPending } = useWorkforceInsights();
 
   // Tenure bucket counts for bar chart
   const tenureBuckets = Object.entries(
@@ -64,6 +66,11 @@ export default function WorkforcePage() {
       <div className="mb-6">
         <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} hasFilters={hasFilters}
           show={{ year: false, month: false, dept: true }} />
+      </div>
+
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="Workforce Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
       </div>
 
       {/* KPI row */}

@@ -9,3 +9,4 @@ export const useWfDistribution = (f: Partial<Filters>) => useQuery({ queryKey: [
 export const useHeadcountTrend = (f: Partial<Filters>) => useQuery({ queryKey: ['wf','hc-trend', f],     queryFn: () => workforceApi.headcountTrend(Q(f)),    staleTime: 60_000 });
 export const useSalaryByDept   = ()                    => useQuery({ queryKey: ['salary','by-dept'],      queryFn: () => workforceApi.salaryByDept(),          staleTime: 60_000 });
 export const useTenure         = (f: Partial<Filters>) => useQuery({ queryKey: ['wf','tenure', f],        queryFn: () => workforceApi.tenure(Q(f)),            staleTime: 60_000 });
+export const useWorkforceInsights = ()                 => useQuery({ queryKey: ['wf','insights'],           queryFn: () => workforceApi.insights(),              staleTime: 60_000 });

@@ -23,4 +23,5 @@ export const salesApi = {
   orders:        (params?: object) => api.get<any[]>('/sales/orders',             p(params ?? {})).then(r => r.data),
   topProducts:   (params?: object) => api.get<any[]>('/sales/top-products',       p(params ?? {})).then(r => r.data),
   topPerCategory:(params?: object) => api.get<any[]>('/sales/top-per-category',   p(params ?? {})).then(r => r.data),
+  insights:      (params?: object) => api.get<import('@/types').Insight[]>('/sales/insights', p(params ?? {})).then(r => r.data),
 };

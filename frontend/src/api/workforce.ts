@@ -22,4 +22,5 @@ export const workforceApi = {
   salarySummary:(params?: object) => api.get<any>('/salary/summary',                        p(params ?? {})).then(r => r.data),
   salaryByDept: ()                => api.get<any[]>('/salary/by-department').then(r => r.data),
   tenure:       (params?: object) => api.get<TenureRow[]>('/hr/tenure',                     p(params ?? {})).then(r => r.data),
+  insights:     ()                => api.get<import('@/types').Insight[]>('/workforce/insights').then(r => r.data),
 };

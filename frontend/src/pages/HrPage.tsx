@@ -5,7 +5,8 @@ import { ChartSkeleton } from '@/components/ui/Skeleton';
 import { HeadcountChart } from '@/components/charts/HeadcountChart';
 import { SimpleBarChart } from '@/components/charts/SimpleBarChart';
 import { useFilters } from '@/hooks/useFilters';
-import { useHrSummary, useHiringTrend, useAttrition } from '@/hooks/useHr';
+import { useHrSummary, useHiringTrend, useAttrition, useHrInsights } from '@/hooks/useHr';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { formatNumber, formatPct } from '@/lib/format';
 import { DEPT_COLORS, cn } from '@/lib/utils';
 
@@ -24,6 +25,7 @@ export default function HrPage() {
   const { data: summary,  isPending: sumPending }  = useHrSummary();
   const { data: hiring,   isPending: hirePending }  = useHiringTrend(filters);
   const { data: attrition,isPending: attrPending }  = useAttrition();
+  const { data: insights, isPending: insightsPending } = useHrInsights();
 
   const attritionBars = (attrition ?? [])
     .sort((a: any, b: any) => b.attrition_rate_pct - a.attrition_rate_pct)
@@ -38,6 +40,11 @@ export default function HrPage() {
       <div className="mb-6">
         <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} hasFilters={hasFilters}
           show={{ year: false, month: false, dept: true }} />
+      </div>
+
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="HR Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
       </div>
 
       {/* KPI row */}

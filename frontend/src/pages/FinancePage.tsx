@@ -4,7 +4,8 @@ import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
 import { ChartSkeleton } from '@/components/ui/Skeleton';
 import { ComboChart } from '@/components/charts/ComboChart';
 import { useFilters } from '@/hooks/useFilters';
-import { useFinanceSummary, useFinanceTrend, useFinanceDeptCosts, useFinanceDeptPnl } from '@/hooks/useFinance';
+import { useFinanceSummary, useFinanceTrend, useFinanceDeptCosts, useFinanceDeptPnl, useFinanceInsights } from '@/hooks/useFinance';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { formatINR, formatPct } from '@/lib/format';
 import { DEPT_COLORS, cn } from '@/lib/utils';
 
@@ -24,12 +25,18 @@ export default function FinancePage() {
   const { data: trend,   isPending: trendPending }  = useFinanceTrend(filters);
   const { data: costs,   isPending: costPending }   = useFinanceDeptCosts(filters);
   const { data: pnl,     isPending: pnlPending }    = useFinanceDeptPnl(filters);
+  const { data: insights,isPending: insightsPending } = useFinanceInsights(filters);
 
   return (
     <AppShell title="Finance Analytics">
       <div className="mb-6">
         <FilterBar filters={filters} setFilter={setFilter} clearFilters={clearFilters} hasFilters={hasFilters}
           show={{ year: true, month: false, dept: false }} />
+      </div>
+
+      {/* Insights */}
+      <div className="mb-6">
+        <InsightPanel title="Finance Insights" insights={insights ?? []} loading={insightsPending} cap={5} />
       </div>
 
       {/* KPI row */}

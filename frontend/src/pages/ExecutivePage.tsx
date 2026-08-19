@@ -1,27 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, AlertTriangle, CheckCircle2, Info, TrendingUp, Package } from 'lucide-react';
+import { ArrowRight, TrendingUp, Package, CheckCircle2 } from 'lucide-react';
 import { AppShell } from '@/layouts/AppShell';
 import { KpiCard } from '@/components/kpi/KpiCard';
 import { RevenueChart } from '@/components/charts/RevenueChart';
 import { DonutChart } from '@/components/charts/DonutChart';
 import { Card, CardHeader, CardTitle } from '@/components/ui/Card';
+import { InsightPanel } from '@/components/ui/InsightPanel';
 import { Badge } from '@/components/ui/Badge';
 import { ChartSkeleton } from '@/components/ui/Skeleton';
 import { useExecutiveOverview, useExecutiveInsights } from '@/hooks/useExecutive';
 import { formatINR, formatNumber, formatDate } from '@/lib/format';
-import { SEVERITY_CONFIG } from '@/lib/utils';
-import type { Insight, InventoryAlert } from '@/types';
+import type { InventoryAlert } from '@/types';
 
 const YEARS = [2024, 2025, 2026];
-
-function InsightIcon({ severity }: { severity: Insight['severity'] }) {
-  const cfg = SEVERITY_CONFIG[severity];
-  if (severity === 'critical') return <AlertTriangle className="w-4 h-4 text-negative" />;
-  if (severity === 'warning')  return <AlertTriangle className="w-4 h-4 text-warning" />;
-  if (severity === 'positive') return <CheckCircle2  className="w-4 h-4 text-positive" />;
-  return <Info className="w-4 h-4 text-primary" />;
-}
 
 export default function ExecutivePage() {
   const [year, setYear] = useState<number | undefined>(undefined);
@@ -91,37 +83,12 @@ export default function ExecutivePage() {
       {/* Insights + Alerts row */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-6">
         {/* Insights panel */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Executive Insights</CardTitle>
-            <span className="text-[10px] text-muted bg-canvas px-2 py-0.5 rounded-full border border-border">
-              Rule-based · No AI
-            </span>
-          </CardHeader>
-          {insightsPending ? (
-            <div className="space-y-2">{[...Array(4)].map((_, i) => (
-              <div key={i} className="h-14 rounded-lg bg-slate-50 animate-pulse" />
-            ))}</div>
-          ) : (
-            <ul className="space-y-2">
-              {(insights ?? []).map((ins, i) => {
-                const cfg = SEVERITY_CONFIG[ins.severity];
-                return (
-                  <li key={i} className={`flex items-start gap-3 p-3 rounded-lg border ${cfg.bg} ${cfg.border}`}>
-                    <InsightIcon severity={ins.severity} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-ink">{ins.message}</p>
-                      <p className="text-[10px] text-muted mt-0.5 capitalize">{ins.category}</p>
-                    </div>
-                  </li>
-                );
-              })}
-              {!insights?.length && (
-                <p className="text-xs text-muted text-center py-6">No insights available for this period.</p>
-              )}
-            </ul>
-          )}
-        </Card>
+        <InsightPanel
+          title="Executive Insights"
+          insights={insights ?? []}
+          loading={insightsPending}
+          cap={6}
+        />
 
         {/* Inventory alerts */}
         <Card>

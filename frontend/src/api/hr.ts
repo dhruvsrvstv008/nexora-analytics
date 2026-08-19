@@ -8,4 +8,5 @@ export const hrApi = {
   attrition:    ()                => api.get<any[]>('/hr/attrition').then(r => r.data),
   tenure:       (params?: object) => api.get<any[]>('/hr/tenure',        p(params ?? {})).then(r => r.data),
   hierarchy:    (params?: object) => api.get<any[]>('/workforce/hierarchy', p(params ?? {})).then(r => r.data),
+  insights:     ()                => api.get<import('@/types').Insight[]>('/hr/insights').then(r => r.data),
 };
